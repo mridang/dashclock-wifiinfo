@@ -1,0 +1,7 @@
+<resources>
+
+    <string name="extension_name">Wireless Information</string>
+    <string name="application_name">Dashclock Wifi Info Extension</string>
+    <string name="extension_info">Displays information about your current wireless network.</string>
+
+</resources>
