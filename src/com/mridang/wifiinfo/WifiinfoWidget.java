@@ -1,6 +1,7 @@
 package com.mridang.wifiinfo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -61,6 +62,7 @@ public class WifiinfoWidget extends DashClockExtension {
                         edtInformation.visible(true);
                         edtInformation.status(wifInfo.getSSID().replaceAll("^\"|\"$", ""));
                         edtInformation.expandedBody(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
+                        edtInformation.clickIntent(new Intent(Settings.ACTION_WIFI_SETTINGS));
 
                     }
 

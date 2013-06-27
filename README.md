@@ -1,4 +1,4 @@
-dashclock-wifiinfo
+dashclock-wireless
 ==================
 
-A Dashclock plugin that displays information about the phone's wireless network 
+A Dashclock plugin that displays information about your current wireless network.
