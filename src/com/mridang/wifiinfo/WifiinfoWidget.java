@@ -1,7 +1,9 @@
 package com.mridang.wifiinfo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -17,7 +19,56 @@ import com.google.android.apps.dashclock.api.ExtensionData;
  */
 public class WifiinfoWidget extends DashClockExtension {
 
-    /*
+	/* This is the instance of the receiver that deals with cellular status */
+	private ToggleReceiver objReceiver;
+
+	/*
+	 * This class is the receiver for getting hotspot toggle events
+	 */
+	private class ToggleReceiver extends BroadcastReceiver {
+
+		/*
+		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+		 */
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			onUpdateData(0);
+
+		}
+
+	}
+
+	/*
+	 * @see com.google.android.apps.dashclock.api.DashClockExtension#onInitialize(boolean)
+	 */
+	@Override
+	protected void onInitialize(boolean booReconnect) {
+
+		super.onInitialize(booReconnect);
+
+		if (objReceiver != null) {
+
+			try {
+
+				Log.d("WifiinfoWidget", "Unregistered any existing status receivers");
+				unregisterReceiver(objReceiver);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		objReceiver = new ToggleReceiver();
+		registerReceiver(objReceiver, new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
+		registerReceiver(objReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+		registerReceiver(objReceiver, new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
+		Log.d("WifiinfoWidget", "Registered the status receiver");
+
+	}
+
+	/*
      * @see com.google.android.apps.dashclock.api.DashClockExtension#onCreate()
      */
     public void onCreate() {
