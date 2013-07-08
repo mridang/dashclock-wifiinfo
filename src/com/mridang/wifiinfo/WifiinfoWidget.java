@@ -102,7 +102,7 @@ public class WifiinfoWidget extends DashClockExtension {
                 ConnectivityManager cmrConnectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
                 Log.d("WifiinfoWidget", "Checking if connected to a wifi network");
-                if (cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
+                if (cmrConnectivity != null && cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 
                     Log.d("WifiinfoWidget", "Connected to a wireless network");
                     WifiManager wifManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
