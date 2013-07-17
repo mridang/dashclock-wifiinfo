@@ -88,6 +88,9 @@ public class WifiinfoWidget extends DashClockExtension {
 	protected void onUpdateData(int arg0) {
 
 		setUpdateWhenScreenOn(true);
+		
+		if (arg0 == DashClockExtension.UPDATE_REASON_PERIODIC) 
+			DonateNotifier.init(getApplicationContext());
 
 		Log.d("WifiinfoWidget", "Fetching wireless network information");
 		ExtensionData edtInformation = new ExtensionData();
