@@ -1,10 +1,16 @@
 package com.mridang.wifiinfo;
 
+import java.util.Random;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
@@ -118,6 +124,40 @@ public class WifiinfoWidget extends DashClockExtension {
 				Log.d("WifiinfoWidget", "Not connected to a wireless network");
 			}
 
+			if (new Random().nextInt(5) == 0) {
+
+				PackageManager mgrPackages = getApplicationContext().getPackageManager();
+
+				try {
+
+					mgrPackages.getPackageInfo("com.mridang.donate", PackageManager.GET_META_DATA);
+
+				} catch (NameNotFoundException e) {
+
+					Integer intExtensions = 0;
+
+					for (PackageInfo pkgPackage : mgrPackages.getInstalledPackages(0)) {
+
+						intExtensions = intExtensions + (pkgPackage.applicationInfo.packageName.startsWith("com.mridang.") ? 1 : 0); 
+
+					}
+
+					if (intExtensions > 1) {
+
+						edtInformation.visible(true);
+						edtInformation.clickIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=com.mridang.donate")));
+						edtInformation.expandedTitle("Please consider a one time purchase to unlock.");
+						edtInformation.expandedBody("Thank you for using " + intExtensions + " extensions of mine. Click this to make a one-time purchase or use just one extension to make this disappear.");
+						setUpdateWhenScreenOn(true);
+
+					}
+
+				}
+
+			} else {
+				setUpdateWhenScreenOn(true);
+			}
+
 		} catch (Exception e) {
 			Log.e("WifiinfoWidget", "Encountered an error", e);
 			BugSenseHandler.sendException(e);
@@ -135,6 +175,20 @@ public class WifiinfoWidget extends DashClockExtension {
 	public void onDestroy() {
 
 		super.onDestroy();
+
+		if (objReceiver != null) {
+
+			try {
+
+				Log.d("WifiinfoWidget", "Unregistered the status receiver");
+				unregisterReceiver(objReceiver);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
 		Log.d("WifiinfoWidget", "Destroyed");
 		BugSenseHandler.closeSession(this);
 
