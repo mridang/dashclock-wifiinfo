@@ -93,11 +93,9 @@ public class WifiinfoWidget extends DashClockExtension {
 	@Override
 	protected void onUpdateData(int arg0) {
 
-		setUpdateWhenScreenOn(true);
-
 		Log.d("WifiinfoWidget", "Fetching wireless network information");
 		ExtensionData edtInformation = new ExtensionData();
-		edtInformation.visible(false);
+		setUpdateWhenScreenOn(true);
 
 		try {
 
@@ -159,6 +157,7 @@ public class WifiinfoWidget extends DashClockExtension {
 			}
 
 		} catch (Exception e) {
+			edtInformation.visible(false);
 			Log.e("WifiinfoWidget", "Encountered an error", e);
 			BugSenseHandler.sendException(e);
 		}
