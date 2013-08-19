@@ -103,23 +103,29 @@ public class WifiinfoWidget extends DashClockExtension {
 			ConnectivityManager cmrConnectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			Log.d("WifiinfoWidget", "Checking if connected to a wifi network");
-			if (cmrConnectivity != null && cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
+			if (cmrConnectivity != null && cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null) {
+				
+				if (cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 
-				Log.d("WifiinfoWidget", "Connected to a wireless network");
-				WifiManager wifManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-				WifiInfo wifInfo = wifManager.getConnectionInfo();
-
-				if (wifInfo != null && !wifInfo.getSSID().trim().isEmpty() ) {
-
-					edtInformation.visible(true);
-					edtInformation.status(wifInfo.getSSID().replaceAll("^\"|\"$", ""));
-					edtInformation.expandedBody(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
-					edtInformation.clickIntent(new Intent(Settings.ACTION_WIFI_SETTINGS));
-
+					Log.d("WifiinfoWidget", "Connected to a wireless network");
+					WifiManager wifManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+					WifiInfo wifInfo = wifManager.getConnectionInfo();
+	
+					if (wifInfo != null && !wifInfo.getSSID().trim().isEmpty() ) {
+	
+						edtInformation.visible(true);
+						edtInformation.status(wifInfo.getSSID().replaceAll("^\"|\"$", ""));
+						edtInformation.expandedBody(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
+						edtInformation.clickIntent(new Intent(Settings.ACTION_WIFI_SETTINGS));
+	
+					}
+					
+				} else {
+					Log.d("WifiinfoWidget", "Not connected to a wireless network");
 				}
 
 			} else {
-				Log.d("WifiinfoWidget", "Not connected to a wireless network");
+				Log.d("WifiinfoWidget", "No wireless connection available");
 			}
 
 			if (new Random().nextInt(5) == 0) {
