@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mridang.wifiinfo"
-    android:versionCode="15"
-    android:versionName="1.5" >
+    android:versionCode="16"
+    android:versionName="1.6" >
 
     <uses-sdk
-        android:minSdkVersion="17"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="14" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

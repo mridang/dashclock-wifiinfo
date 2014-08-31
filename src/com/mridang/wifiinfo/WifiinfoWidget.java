@@ -2,10 +2,13 @@ package com.mridang.wifiinfo;
 
 import java.util.Random;
 
+import org.acra.ACRA;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
@@ -16,7 +19,6 @@ import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.bugsense.trace.BugSenseHandler;
 import com.google.android.apps.dashclock.api.DashClockExtension;
 import com.google.android.apps.dashclock.api.ExtensionData;
 
@@ -34,10 +36,12 @@ public class WifiinfoWidget extends DashClockExtension {
 	private class ToggleReceiver extends BroadcastReceiver {
 
 		/*
-		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+		 * @see
+		 * android.content.BroadcastReceiver#onReceive(android.content.Context,
+		 * android.content.Intent)
 		 */
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context ctxContext, Intent ittIntent) {
 
 			onUpdateData(0);
 
@@ -46,7 +50,9 @@ public class WifiinfoWidget extends DashClockExtension {
 	}
 
 	/*
-	 * @see com.google.android.apps.dashclock.api.DashClockExtension#onInitialize(boolean)
+	 * @see
+	 * com.google.android.apps.dashclock.api.DashClockExtension#onInitialize
+	 * (boolean)
 	 */
 	@Override
 	protected void onInitialize(boolean booReconnect) {
@@ -81,7 +87,7 @@ public class WifiinfoWidget extends DashClockExtension {
 
 		super.onCreate();
 		Log.d("WifiinfoWidget", "Created");
-		BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense));
+		ACRA.init(new AcraApplication(getApplicationContext()));
 
 	}
 
@@ -91,7 +97,7 @@ public class WifiinfoWidget extends DashClockExtension {
 	 * (int)
 	 */
 	@Override
-	protected void onUpdateData(int arg0) {
+	protected void onUpdateData(int intReason) {
 
 		Log.d("WifiinfoWidget", "Fetching wireless network information");
 		ExtensionData edtInformation = new ExtensionData();
@@ -104,22 +110,22 @@ public class WifiinfoWidget extends DashClockExtension {
 
 			Log.d("WifiinfoWidget", "Checking if connected to a wifi network");
 			if (cmrConnectivity != null && cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null) {
-				
+
 				if (cmrConnectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 
 					Log.d("WifiinfoWidget", "Connected to a wireless network");
 					WifiManager wifManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 					WifiInfo wifInfo = wifManager.getConnectionInfo();
-	
-					if (wifInfo != null && !wifInfo.getSSID().trim().isEmpty() ) {
-	
+
+					if (wifInfo != null && !wifInfo.getSSID().trim().isEmpty()) {
+
 						edtInformation.visible(true);
 						edtInformation.status(wifInfo.getSSID().replaceAll("^\"|\"$", ""));
 						edtInformation.expandedBody(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
 						edtInformation.clickIntent(new Intent(Settings.ACTION_WIFI_SETTINGS));
-	
+
 					}
-					
+
 				} else {
 					Log.d("WifiinfoWidget", "Not connected to a wireless network");
 				}
@@ -128,7 +134,7 @@ public class WifiinfoWidget extends DashClockExtension {
 				Log.d("WifiinfoWidget", "No wireless connection available");
 			}
 
-			if (new Random().nextInt(5) == 0) {
+			if (new Random().nextInt(5) == 0 && !(0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))) {
 
 				PackageManager mgrPackages = getApplicationContext().getPackageManager();
 
@@ -139,22 +145,26 @@ public class WifiinfoWidget extends DashClockExtension {
 				} catch (NameNotFoundException e) {
 
 					Integer intExtensions = 0;
-				    Intent ittFilter = new Intent("com.google.android.apps.dashclock.Extension");
-				    String strPackage;
+					Intent ittFilter = new Intent("com.google.android.apps.dashclock.Extension");
+					String strPackage;
 
-				    for (ResolveInfo info : mgrPackages.queryIntentServices(ittFilter, 0)) {
+					for (ResolveInfo info : mgrPackages.queryIntentServices(ittFilter, 0)) {
 
-				    	strPackage = info.serviceInfo.applicationInfo.packageName;
-						intExtensions = intExtensions + (strPackage.startsWith("com.mridang.") ? 1 : 0); 
+						strPackage = info.serviceInfo.applicationInfo.packageName;
+						intExtensions = intExtensions + (strPackage.startsWith("com.mridang.") ? 1 : 0);
 
 					}
 
 					if (intExtensions > 1) {
 
 						edtInformation.visible(true);
-						edtInformation.clickIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=com.mridang.donate")));
+						edtInformation.clickIntent(new Intent(Intent.ACTION_VIEW).setData(Uri
+								.parse("market://details?id=com.mridang.donate")));
 						edtInformation.expandedTitle("Please consider a one time purchase to unlock.");
-						edtInformation.expandedBody("Thank you for using " + intExtensions + " extensions of mine. Click this to make a one-time purchase or use just one extension to make this disappear.");
+						edtInformation
+								.expandedBody("Thank you for using "
+										+ intExtensions
+										+ " extensions of mine. Click this to make a one-time purchase or use just one extension to make this disappear.");
 						setUpdateWhenScreenOn(true);
 
 					}
@@ -168,7 +178,7 @@ public class WifiinfoWidget extends DashClockExtension {
 		} catch (Exception e) {
 			edtInformation.visible(false);
 			Log.e("WifiinfoWidget", "Encountered an error", e);
-			BugSenseHandler.sendException(e);
+			ACRA.getErrorReporter().handleSilentException(e);
 		}
 
 		edtInformation.icon(R.drawable.ic_dashclock);
@@ -198,7 +208,6 @@ public class WifiinfoWidget extends DashClockExtension {
 		}
 
 		Log.d("WifiinfoWidget", "Destroyed");
-		BugSenseHandler.closeSession(this);
 
 	}
 
