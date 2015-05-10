@@ -3,5 +3,7 @@
     <string name="extension_name">Wireless Network</string>
     <string name="application_name">Dashclock Wireless Extension</string>
     <string name="extension_info">Displays information about your current wireless network.</string>
+    <string name="secured_network">Connected to a %1$s secured network at %2$s%3$s</string>
+    <string name="unsecured_network">Connected to an unsecured network at %1$s%2$s</string>
 
 </resources>

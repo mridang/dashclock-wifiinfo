@@ -1,19 +1,21 @@
 package com.mridang.wifiinfo;
 
-import org.acra.ACRA;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiConfiguration;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
 
 import com.google.android.apps.dashclock.api.ExtensionData;
+
+import org.acra.ACRA;
+
+import java.util.List;
 
 /*
  * This class is the main class that provides the widget
@@ -76,6 +78,27 @@ public class WifiinfoWidget extends ImprovedExtension {
 					Log.d(getTag(), "Connected to a wireless network");
 					WifiManager wifManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 					WifiInfo wifInfo = wifManager.getConnectionInfo();
+					List<ScanResult> networks = wifManager.getScanResults();
+					String security = null;
+					if (networks != null) {
+						for (ScanResult network : networks) {
+							if (network.BSSID.equalsIgnoreCase(wifInfo.getBSSID())) {
+								String capabilities = network.capabilities;
+								Log.d(getTag(), "Current network security is " + capabilities);
+								if (capabilities.contains("WEP")) {
+									security = "WEP";
+								} else if (capabilities.contains("WPA2-PSK")) {
+									security = "WPA2-PSK";
+								} else if (capabilities.contains("WPA2")) {
+									security = "WPA2";
+								} else if (capabilities.contains("WPA")) {
+									security = "WPA";
+								} else {
+									security = null;
+								}
+							}
+						}
+					}
 
 					if (wifInfo != null && !wifInfo.getSSID().trim().isEmpty()) {
 
@@ -83,7 +106,11 @@ public class WifiinfoWidget extends ImprovedExtension {
 						edtInformation.visible(true);
 						edtInformation.status(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
 						edtInformation.expandedTitle(wifInfo.getSSID().replaceAll("^\"|\"$", ""));
-						edtInformation.expandedBody(wifInfo.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS);
+						if (security == null) {
+							edtInformation.expandedBody(getString(R.string.unsecured_network, wifInfo.getLinkSpeed(), WifiInfo.LINK_SPEED_UNITS));
+						} else {
+							edtInformation.expandedBody(getString(R.string.secured_network, security, wifInfo.getLinkSpeed(), WifiInfo.LINK_SPEED_UNITS));
+						}
 						edtInformation.clickIntent(new Intent(Settings.ACTION_WIFI_SETTINGS));
 
 					}
